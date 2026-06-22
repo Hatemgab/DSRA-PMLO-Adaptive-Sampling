@@ -227,22 +227,16 @@ The final graph shows:
 - y-axis: `Data value`
 
 
-### Manual Mode Example
+### Manual Mode Optimization Example 
 
 Coarse grid search image:
-
-```markdown
 ![Manual coarse grid search](./docs/assets/manual_coarse_grid_search.png)
-```
 
 Zoomed grid search image:
 ![Manual zoomed grid search](./docs/assets/manual_zoomed_grid_search.png)
 
 Fine grid search image:
-
-```markdown
 ![Manual fine grid search](./docs/assets/manual_fine_grid_search.png)
-```
 
 ## Using The Package In Your Own Python Code
 
