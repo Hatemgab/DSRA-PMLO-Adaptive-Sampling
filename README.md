@@ -4,6 +4,12 @@
 
 DSRA-PMLO helps reduce sensor data transmission by selecting fewer sampling points while keeping the reconstructed signal within a user-defined error threshold.
 
+## Result Demonstration
+
+https://github.com/user-attachments/assets/a74d40a2-fe6e-4e91-8129-8563600149d8
+
+> *Above: Dynamic demonstration of the adaptive sampling process.*
+
 ## Project Overview
 
 In IoT and wireless sensor networks, data transmission is often one of the most energy-consuming operations. This project searches for two adaptive sampling parameters:
@@ -37,6 +43,12 @@ src/dsra_pmlo/use_case.py
 ```
 
 Do not run `automated.py`, `manual.py`, or `base.py` directly. They are package modules.
+
+## Video Demonstration
+
+[![Video Demo](https://img.shields.io/badge/Video-Demo-red)](video_address)
+
+> *Click the badge above to watch a short video on how to use the Manual and Automated modes.*
 
 ## Environment Setup
 
