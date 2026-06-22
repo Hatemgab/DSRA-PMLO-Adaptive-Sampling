@@ -227,16 +227,14 @@ The final graph shows:
 - y-axis: `Data value`
 
 
-### Manual Mode Optimization Example 
+### Manual Mode Optimization Example
 
-Coarse grid search image:
-![Manual coarse grid search](./docs/assets/manual_coarse_grid_search.png)
+| Step 1: Coarse Grid Search | Step 2: Zoomed Grid Search | Step 3: Fine Grid Search |
+| :---: | :---: | :---: |
+| ![Manual coarse grid search](./docs/assets/manual_coarse_grid_search.png) | ![Manual zoomed grid search](./docs/assets/manual_zoomed_grid_search.png) | ![Manual fine grid search](./docs/assets/manual_fine_grid_search.png) |
 
-Zoomed grid search image:
-![Manual zoomed grid search](./docs/assets/manual_zoomed_grid_search.png)
+> *The three grid-search plots guide the user from a broad E/S search area to a smaller range for dual annealing optimization.*
 
-Fine grid search image:
-![Manual fine grid search](./docs/assets/manual_fine_grid_search.png)
 
 ## Using The Package In Your Own Python Code
 
