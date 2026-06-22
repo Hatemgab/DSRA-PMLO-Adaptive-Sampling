@@ -1,0 +1,283 @@
+# src/dsra_pmlo/base.py
+import pandas as pd
+from matplotlib import pyplot as plt
+import numpy as np
+import math
+
+# Base class for DSRA PMLO models
+class DSRABase:
+    # Set default values for parameters
+    def __init__(self, filepath, similarity_method="MAAPE", interpolation_method="quadratic", similarity_threshold=2, target_col="Amplitude"):
+        self.filepath = filepath
+        self.target_col = target_col
+        self.similarity_method = similarity_method
+        self.interpolation_method = interpolation_method
+        self.similarity_threshold = similarity_threshold
+        self.sensor_data_total = None
+        self.train_data = None
+        self.raw_data = None
+
+    def load_data(self, target_size=None): 
+        # Load data from the file
+        print(f"Loading data from: {self.filepath}")
+        self.raw_data = pd.read_csv(self.filepath, sep=r'\s+')
+        
+        # Get data length of target column
+        if self.target_col in self.raw_data.columns:
+            data_array = np.array(self.raw_data[self.target_col])
+            if target_size:
+                self.sensor_data_total = np.resize(data_array, target_size)
+            else:
+                self.sensor_data_total = data_array
+                
+            # Run the mode-specific training split.
+            self.prepare_train_data()
+            
+            print(f"Successfully loaded '{self.target_col}'.\n")
+        else:
+            available = ", ".join(self.raw_data.columns)
+            raise ValueError(f"Target column '{self.target_col}' not found. Available columns: {available}")
+
+    def prepare_train_data(self):
+        # Default split: first 40% for testing and last 60% for training.
+        split_idx = round(len(self.sensor_data_total) * 0.4)
+        
+        self.train_data = self.sensor_data_total[split_idx:]  
+        print(f"Base Data Split: Train size = {len(self.train_data)} (Last 60%)")
+        
+    def get_data_summary(self):
+        if self.sensor_data_total is not None:
+            print(f"=== Data summary for {self.target_col} ===")
+            print(f"Total length (training + testing): {len(self.sensor_data_total)}")
+            print(f"Training length: {len(self.train_data)}\n")
+
+            # Plot total data
+            plt.plot(self.sensor_data_total)
+            plt.title(f"Target Feature: {self.target_col}")
+            plt.show()
+            
+            # Plot training data
+            plt.plot(self.train_data)
+            plt.title(f"Training Feature: {self.target_col}")
+            plt.show()
+            
+    def interp_linear(self, x, y):
+        '''Linear interpolation'''
+        res = []
+        for i in range(1, len(x)):
+            slope = (y[i] - y[i - 1]) / (x[i] - x[i - 1])
+            l = y[i] - slope * x[i]
+            res.extend([slope * x_betw + l for x_betw in range(x[i - 1], x[i])])
+        res.append(y[-1])
+        return np.array(res)
+    
+    def interp_quadratic(self, x, y):
+        '''Quadratic interpolation'''
+        if len(x) == 2:
+            print('Use linear interpolation instead of polinomial when number of samples equals 2')
+            return self.interp_linear(x, y)
+        
+        a = ((y[2] - y[0]) / ((x[2] - x[0]) * (x[2] - x[1])) - 
+             (y[1] - y[0]) / ((x[1] - x[0]) * (x[2] - x[1])))
+        b = (a * (x[0] ** 2 - x[1] ** 2) + y[1] - y[0]) / (x[1] - x[0])
+        c = y[0] - a * x[0] ** 2 - b * x[0]
+        res = [a * x_betw ** 2 + b * x_betw + c for x_betw in range(x[0], x[2])]
+        for i in range(1, len(x) - 2):
+            a = ((y[i + 2] - y[i]) / ((x[i + 2] - x[i]) * (x[i + 2] - x[i + 1])) - 
+                 (y[i + 1] - y[i]) / ((x[i + 1] - x[i]) * (x[i + 2] - x[i + 1])))
+            b = (a * (x[i] ** 2 - x[i + 1] ** 2) + y[i + 1] - y[i]) / (x[i + 1] - x[i])
+            c = y[i] - a * x[i] ** 2 - b * x[i]
+            res.extend([a * x_betw ** 2 + b * x_betw + c for x_betw in range(x[i + 1], x[i + 2])])  
+        res.append(y[-1])
+        return np.array(res)
+    
+    def cor(self, f, g):
+        '''Correlation function that you provide'''
+        return 100 * np.dot(f, g) / (math.sqrt(np.dot(f, f)) * math.sqrt(np.dot(g, g)))
+    
+    # Check this article for MAAPE "A new metric of absolute percentage error for intermittent demand forecasts"
+    def MAAPE(self, f,g):
+        EPSILON = 1e-10
+        return np.mean(np.arctan(np.abs((f - g) / (f + EPSILON)))) * 100
+
+    def measure(self, params, *other):                                                        
+        '''Returns the number of measurements for certain E and S.'''
+        data, interpolation, error, min_sim = other
+        data = np.array(data).flatten()
+        E, S = params
+        prev_meas = 0
+        new_meas = max(1, int(round(E)))
+        measurements = []
+        days = []
+        slope = 0
+        while new_meas < len(data):
+            slope = abs((data[new_meas] - data[prev_meas])) / (new_meas - prev_meas) #prev_meas and new_meas are used as an index (days)
+            measurements.append(data[prev_meas])                                   
+            days.append(prev_meas)                                             
+            prev_meas, new_meas = new_meas, new_meas + max(1, int(round(E - S * slope)))
+            
+        measurements.append(data[prev_meas])
+        days.append(prev_meas)
+        num_of_meas = len(days)
+        
+        if prev_meas != len(data) - 1:                        # to include the last measurement, in case the last point from DSRA is not the last point of the oriognal data (to include the last measurements  even it is no considered)
+            measurements.append(data[-1])
+            days.append(len(data) - 1)
+        
+        if interpolation == 'linear':
+            interp_sampl = self.interp_linear(days, measurements)
+        else:
+            interp_sampl = self.interp_quadratic(days, measurements)
+    
+        if error == 'correlation':
+            similarity = self.cor(data, interp_sampl)
+            criterion = similarity >= (min_sim * 0.99)
+        else:
+            similarity = self.MAAPE(data, interp_sampl)
+            criterion = similarity <= (min_sim * 1.1)
+        
+        if not criterion:
+            return len(data) * 10 + abs(similarity - min_sim) * 100
+
+        return num_of_meas
+
+    def cal_dsra_grid(self, range_k, range_c):
+        """
+        Core computation engine: Runs the DSRA logic across a grid of E and S.
+        Returns three lists: x (E values), y (S values), and z (Number of measurements).
+        """
+        z_vals, x_vals, y_vals = [], [], []
+        data = self.train_data
+        
+        for k in range_k:
+            for c in range_c:
+                similarity, _, _, indices, _, _ = self.reconstruct_signal(k, c, data=data)
+                if self.similarity_method == 'correlation':
+                    criterion = similarity >= self.similarity_threshold
+                else:
+                    criterion = similarity <= self.similarity_threshold
+                
+                if criterion:
+                    z_vals.append(len(indices))
+                    x_vals.append(k)
+                    y_vals.append(c)
+                    
+        return x_vals, y_vals, z_vals
+
+
+    def reconstruct_signal(self, E, S, data=None):
+        """
+        Internal engine to perform DSRA sampling and signal reconstruction.
+        Returns: similarity, reconstructed_signal, measurement_values, measurement_indices, reduction_rate
+        """
+        if data is None:
+            data = self.train_data
+            
+        prev_meas = 0
+        new_meas = max(1, int(round(E))) 
+        measurements = []
+        indices = [] # to store indices of measurements
+        
+        # DSRA sampling loop
+        while new_meas < len(data):
+            denom = max(1, new_meas - prev_meas)
+            slope = abs((data[new_meas] - data[prev_meas])) / denom
+            measurements.append(data[prev_meas])
+            indices.append(prev_meas)
+            # Update indices based on E and S.
+            prev_meas, new_meas = new_meas, new_meas + max(1, int(round(E - S * slope)))
+            
+        # Ensure the last points are included
+        measurements.append(data[prev_meas])
+        indices.append(prev_meas)
+        if prev_meas != len(data) - 1:
+            measurements.append(data[-1])
+            indices.append(len(data) - 1)
+            
+        # Interpolation
+        if self.interpolation_method == 'linear':
+            reconstructed = self.interp_linear(indices, measurements)
+        else:
+            reconstructed = self.interp_quadratic(indices, measurements)
+            
+        # Metrics
+        if self.similarity_method == 'correlation':
+            similarity = self.cor(data, reconstructed)
+        else:
+            similarity = self.MAAPE(data, reconstructed)
+        
+        # Record number of sampling
+        num_samples = len(indices) 
+        
+        # Caculate reduced percentage
+        reduction = abs((round(num_samples / len(data), 2) * 100) - 100)
+        
+        return similarity, reconstructed, measurements, indices, reduction, num_samples
+    
+    def plot_reconstruction(self, E, S, data=None, title_prefix="Final Evaluation"):
+        # if pass in test data use it，else use training data
+        target_data = data if data is not None else self.train_data
+        
+        # Get result
+        sim, recon, meas, idx, red, num_samples = self.reconstruct_signal(E, S, data=target_data)
+        
+        plt.figure(figsize=(12, 5))
+        plt.plot(target_data, color='orange', label='Original Signal', alpha=0.8)
+        plt.plot(
+            recon,
+            linestyle=(0, (7, 7)),
+            color='blue',
+            label=f'DSRA Reconstruction (E={E:.4f}, S={S:.4f})',
+        )
+
+        signal_range = np.max(target_data) - np.min(target_data)
+        baseline = np.min(target_data) - 0.1 * signal_range
+        plt.scatter(
+            idx,
+            np.full(len(idx), baseline),
+            edgecolors='black',
+            facecolors='tab:blue',
+            s=35,
+            label='Sampling Points',
+            zorder=3,
+        )
+        plt.axhline(y=baseline, color='gray', linestyle='--', alpha=0.5)
+        
+        # Show how many samples are used 
+        plt.title(f"{title_prefix} | Samples Used: {num_samples}/{len(target_data)} | Reduction: {red:.2f}%")
+        plt.xlabel("Time(S)")
+        plt.ylabel("Data value")
+        plt.legend(loc='upper right')
+        plt.grid(ls='--')
+        plt.show()
+        
+        print(f"Testing Results -> Samples: {num_samples}, Reduction: {red:.2f}%, Error: {sim:.4f}%")
+        
+    def evaluate_test_set(self, E, S, split_ratio=0.4, new_filepath=None):
+        """
+        Use optimized E and S for testing data evaluation.
+        """
+        # Handle newly passed in file
+        if new_filepath:
+            print(f"Loading new test file: {new_filepath}")
+            
+        # Prepare test data
+        split_idx = round(len(self.sensor_data_total) * split_ratio)
+        test_data = self.sensor_data_total[:split_idx]
+
+        print(f"\n--- TEST SET EVALUATION (First {int(split_ratio*100)}%) ---")
+        print(f"Testing data length: {len(test_data)}")
+        print(f"Parameters used: E={E}, S={S}")
+
+        # Call reconstruct_signal logic
+        sim, recon, meas, idx, red, num_samples = self.reconstruct_signal(E, S, data=test_data)
+
+        # Print result
+        print(f"Samples used in Test Set: {num_samples}")
+        print(f"Data reduction in Test Set: {red:.2f}%")
+        print(f"MAAPE error in Test Set: {sim:.4f}%")
+
+        # Visulaize 
+        self.plot_reconstruction(E, S, data=test_data, title_prefix="Test Evaluation")
+    
+        return sim, red, num_samples
