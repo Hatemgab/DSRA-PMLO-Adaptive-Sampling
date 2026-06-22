@@ -236,10 +236,7 @@ Coarse grid search image:
 ```
 
 Zoomed grid search image:
-
-```markdown
-![Manual zoomed grid search](./assets/manual_zoomed_grid_search.png)
-```
+![Manual zoomed grid search](./docs/assets/manual_zoomed_grid_search.png)
 
 Fine grid search image:
 
