@@ -6,7 +6,7 @@ from scipy.optimize import dual_annealing
 # Only change paramaters from config
 config = {
     "file": "src/dsra_pmlo/data/synthetic_data_50Hz.txt",
-    "mode": "manual", # change 'automated' to 'manual' for setting search ranges manually
+    "mode": "automated", # change 'automated' to 'manual' for setting search ranges manually
     "target_col": "Amplitude",
     "target_size": 400,
     "threshold": 2,

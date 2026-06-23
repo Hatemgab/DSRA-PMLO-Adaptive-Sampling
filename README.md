@@ -33,7 +33,10 @@ drsa_pmlo/
         ├── automated.py
         ├── use_case.py
         └── data/
-            └── your_data.txt or your_data.csv
+            ├── motor_light_load.txt
+            ├── motor_no_load_brb.txt
+            ├── motor_no_load.txt
+            └── synthetic_data_50Hz.txt
 ```
 
 The main file users should edit and run is:
@@ -77,11 +80,9 @@ dsra-use-case
 
 In Colab, install the project as a Python package before importing it.
 
-Replace `YOUR_USERNAME/YOUR_REPOSITORY` with your GitHub repository path.
-
 ```python
-!git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
-%cd YOUR_REPOSITORY
+!git clone https://github.com/Hatemgab/DSRA-PMLO.git
+%cd DSRA-PMLO
 !python -m pip install -e .
 ```
 
@@ -146,10 +147,9 @@ config = {
 
 | Feature | Manual Mode | Automated Mode |
 | :--- | :--- | :--- |
-| User effort | User chooses the E/S zoom area | Program searches automatically |
-| Speed | Faster, because the user narrows the search | Slower, because the program explores ranges |
+| User effort | User chooses the E and S zoom area | Program searches automatically |
 | Visualization | Three zoom-in grid search plots | Final reconstruction/evaluation plot |
-| Best for | Teaching, inspection, controlled tuning | Set-and-run optimization |
+| Best for | Inspection and controlled tuning | Set and run optimization |
 
 ## Automated Mode
 
@@ -167,11 +167,11 @@ Then run:
 python3 -m dsra_pmlo.use_case
 ```
 
-Automated mode performs a **Coarse-to-Fine Grid Search**, then refines the result with dual annealing optimization. It prints the selected E/S values and plots the test-set reconstruction.
+Automated mode performs a **Coarse-to-Fine Grid Search**, then refines the result with dual annealing optimization. It prints the selected E and S values and plots the test-set reconstruction.
 
 ## Manual Mode
 
-Use manual mode when you want the user to inspect the E/S search area and choose where to zoom in.
+Use manual mode when you want the user to inspect the E and S search area and choose where to zoom in.
 
 In `use_case.py`:
 
