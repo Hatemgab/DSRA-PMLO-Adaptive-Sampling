@@ -142,7 +142,7 @@ class DSRABase:
         return np.array(res)
     
     def cor(self, f, g):
-        '''Correlation function that you provide'''
+        '''Return normalized dot-product similarity as a percentage.'''
         denom = math.sqrt(np.dot(f, f)) * math.sqrt(np.dot(g, g))
         if denom == 0:
             raise ValueError("Correlation is undefined for all-zero signals.")
@@ -274,7 +274,12 @@ class DSRABase:
     
     def plot_reconstruction(self, E, S, data=None, title_prefix="Final Evaluation"):
         # If pass in test data use it，else use training data
-        target_data = data if data is not None else self.train_data
+
+        if data is None:
+            print("Plotting training data because no data was provided.")
+            target_data = self.train_data
+        else:
+            target_data = data
         
         # Get result
         sim, recon, meas, idx, red, num_samples = self.reconstruct_signal(E, S, data=target_data)

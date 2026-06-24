@@ -15,7 +15,7 @@ config = {
     "mode": "automated", # change 'automated' to 'manual' for setting search ranges manually
     "target_col": "Amplitude",
     "target_size": 400,
-    "threshold": 2,
+    "threshold": 5,
     # Manual mode Step 1 ranges. Edit these for the first broad search.
     "manual_step1_e": (0, 30, 2),
     "manual_step1_s": (-5, 450, 5),
