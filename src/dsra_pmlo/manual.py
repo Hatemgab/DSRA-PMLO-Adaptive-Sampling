@@ -25,16 +25,16 @@ class DSRAManual(DSRABase):
         print("Manual loading...")
         return super().load_data(target_size=target_size)
 
-    def plot2d(self, range_k, range_c):
+    def plot2d(self, range_e, range_s):
         """
         Plots a scatter graph showing how E and S affect the number of measurements.
         Colors represent the density/efficiency of the measurements.
         """
         # Request calculation results from the base class
-        x, y, z = self.cal_dsra_grid(range_k, range_c)
+        x, y, z = self.cal_dsra_grid(range_e, range_s)
         
         if not z:
-            print(" No parameters met the similarity threshold. Try adjusting range_k or range_c.")
+            print(" No parameters met the similarity threshold. Try adjusting range_e or range_s.")
             return
 
         # Visualize the results

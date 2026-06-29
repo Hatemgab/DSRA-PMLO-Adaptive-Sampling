@@ -192,7 +192,7 @@ class DSRABase:
             similarity = self.MAAPE(data, interp_sampl)
             return num_of_meas if similarity <= min_sim else len(data)
 
-    def cal_dsra_grid(self, range_k, range_c):
+    def cal_dsra_grid(self, range_e, range_s):
         """
         Core computation engine: Runs the DSRA logic across a grid of E and S.
         Returns three lists: x (E values), y (S values), and z (Number of measurements).
@@ -200,9 +200,9 @@ class DSRABase:
         z_vals, x_vals, y_vals = [], [], []
         data = self._validate_data_ready(self.train_data, "Training data")
         
-        for k in range_k:
-            for c in range_c:
-                similarity, _, _, indices, _, _ = self.reconstruct_signal(k, c, data=data)
+        for e_value in range_e:
+            for s_value in range_s:
+                similarity, _, _, indices, _, _ = self.reconstruct_signal(e_value, s_value, data=data)
                 if self.similarity_method == 'correlation':
                     criterion = similarity >= self.similarity_threshold
                 else:
@@ -210,8 +210,8 @@ class DSRABase:
                 
                 if criterion:
                     z_vals.append(len(indices))
-                    x_vals.append(k)
-                    y_vals.append(c)
+                    x_vals.append(e_value)
+                    y_vals.append(s_value)
                     
         return x_vals, y_vals, z_vals
 
