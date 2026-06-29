@@ -1,4 +1,4 @@
-# DSRA-PMLO
+# # DSRA-PMLO: Parametric Adaptive Sampling for Efficient IoT Data Collection
 
 **A parametric adaptive sampling algorithm for efficient IoT data collection.**
 
