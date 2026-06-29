@@ -105,9 +105,9 @@ dsra-use-case
 In Colab, install the project as a Python package before importing it.
 
 ```python
-!git clone https://github.com/Hatemgab/DSRA-PMLO.git
-%cd DSRA-PMLO
-!python -m pip install -e .
+git clone https://github.com/Hatemgab/DSRA-PMLO-Adaptive-Sampling.git
+cd DSRA-PMLO-Adaptive-Sampling
+python -m pip install -e .
 %cd src
 ```
 
