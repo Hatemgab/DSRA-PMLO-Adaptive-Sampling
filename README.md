@@ -25,18 +25,20 @@ The algorithm reconstructs the original signal from selected sampling points and
 DSRA-PMLO/
 ├── pyproject.toml
 ├── README.md
-└── src/
-    └── dsra_pmlo/
-        ├── __init__.py
-        ├── base.py
-        ├── manual.py
-        ├── automated.py
-        ├── use_case.py
-        └── data/
-            ├── motor_light_load.txt
-            ├── motor_no_load_brb.txt
-            ├── motor_no_load.txt
-            └── synthetic_data_50Hz.txt
+├── src/
+│   └── dsra_pmlo/
+│       ├── __init__.py
+│       ├── base.py
+│       ├── manual.py
+│       ├── automated.py
+│       ├── use_case.py
+│       └── data/
+│           ├── motor_light_load.txt
+│           ├── motor_no_load_brb.txt
+│           ├── motor_no_load.txt
+│           └── synthetic_data.txt
+└── tests/
+    └── test.py
 ```
 
 The main file users should edit and run is:
@@ -128,7 +130,7 @@ In `src/dsra_pmlo/use_case.py`, update:
 
 ```python
 config = {
-    "file": "src/dsra_pmlo/data/synthetic_data_50Hz.txt",
+    "file": "src/dsra_pmlo/data/synthetic_data.txt",
     "mode": "automated",
     "target_col": "Amplitude",
     "target_size": 400,
@@ -191,7 +193,7 @@ python3 -m dsra_pmlo.use_case
 Manual mode guides the user through three grid-search plots before dual annealing optimization:
 
 1. **Coarse Grid Search**  
-   The program plots the first broad E/S search area. The user defines this first range in `config`:
+   The program plots the first broad E and S search area. The user defines this first range in `config`:
 
    ```python
    "manual_step1_e": (0, 30, 2),
@@ -199,7 +201,7 @@ Manual mode guides the user through three grid-search plots before dual annealin
    ```
 
 2. **Zoomed Grid Search**  
-   The program suggests a second E/S range based on Step 1. The user can press Enter to accept or type a custom range:
+   The program suggests a second E and S range based on Step 1. The user can press Enter to accept or type a custom range:
 
    ```text
    start,stop,step
@@ -213,9 +215,9 @@ Manual mode guides the user through three grid-search plots before dual annealin
    ```
 
 3. **Fine Grid Search**  
-   The program suggests a third, smaller E/S range based on Step 2. The user again accepts the suggestion or enters their own range. This Step 3 range is then used for dual annealing optimization.
+   The program suggests a third, smaller E and S range based on Step 2. The user again accepts the suggestion or enters their own range. This Step 3 range is then used for dual annealing optimization.
 
-After Step 3, the selected E/S area is passed to dual annealing optimization, then the result is evaluated on the test set.
+After Step 3, the selected E and S area is passed to dual annealing optimization, then the result is evaluated on the test set.
 
 If the user presses Enter or enters invalid input, the program uses a safe suggested range instead of crashing.
 
@@ -236,7 +238,7 @@ The final graph shows:
 | :---: | :---: | :---: |
 | ![Manual coarse grid search](./docs/assets/manual_coarse_grid_search.png) | ![Manual zoomed grid search](./docs/assets/manual_zoomed_grid_search.png) | ![Manual fine grid search](./docs/assets/manual_fine_grid_search.png) |
 
-> *The three grid-search plots guide the user from a broad E/S search area to a smaller range for dual annealing optimization.*
+> *The three grid-search plots guide the user from a broad E and S search area to a smaller range for dual annealing optimization.*
 
 
 ## Using The Package In Your Own Python Code
@@ -245,7 +247,7 @@ The final graph shows:
 from dsra_pmlo.automated import DSRAAutomated
 
 model = DSRAAutomated(
-    filepath="src/dsra_pmlo/data/synthetic_data_50Hz.txt",
+    filepath="src/dsra_pmlo/data/synthetic_data.txt",
     target_col="Amplitude",
     similarity_threshold=2,
 )
@@ -262,7 +264,7 @@ Manual mode:
 from dsra_pmlo.manual import DSRAManual
 
 model = DSRAManual(
-    filepath="src/dsra_pmlo/data/synthetic_data_50Hz.txt",
+    filepath="src/dsra_pmlo/data/synthetic_data.txt",
     target_col="Amplitude",
     similarity_threshold=2,
 )

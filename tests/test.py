@@ -241,9 +241,9 @@ def run_tests():
                     ),
                 ),
                 (
-                    "invalid E/S values",
+                    "invalid E and S values",
                     lambda: expect_exception(
-                        "invalid E/S values",
+                        "invalid E and S values",
                         ValueError,
                         "finite",
                         lambda: loaded_auto().reconstruct_signal(float("nan"), 1),

@@ -11,6 +11,11 @@ class DSRAManual(DSRABase):
         super().__init__(**kwargs)
     
     def prepare_train_data(self):
+        """
+        Split the loaded signal for manual mode.
+
+        The first 40% is kept for testing. The last 60% is used for training.
+        """
         total_len = len(self.sensor_data_total)
         
         # First 40% is reserved for testing; the remaining 60% is used for training.
@@ -22,13 +27,20 @@ class DSRAManual(DSRABase):
 
     # Load data manually
     def load_data(self, target_size=None):
+        """
+        Load data for manual mode.
+
+        target_size can resize the signal before the train/test split.
+        """
         print("Manual loading...")
         return super().load_data(target_size=target_size)
 
     def plot2d(self, range_e, range_s):
         """
-        Plots a scatter graph showing how E and S affect the number of measurements.
-        Colors represent the density/efficiency of the measurements.
+        Plot valid E and S pairs for the selected ranges.
+
+        range_e and range_s usually come from Python range(...). The plot helps
+        the user choose smaller E and S ranges for the next manual step.
         """
         # Request calculation results from the base class
         x, y, z = self.cal_dsra_grid(range_e, range_s)
@@ -56,7 +68,10 @@ class DSRAManual(DSRABase):
 
     def optimize_and_reconstruct(self, bounds):
         """
-        Optimize E and S inside manually selected bounds using the standard DSRA logic.
+        Optimize E and S inside manually selected bounds.
+
+        bounds must contain one range for E and one range for S, for example
+        [(1, 5), (-1, 10)].
         """
         bounds = self._validate_bounds(bounds)
 

@@ -24,7 +24,9 @@ config = {
 
 def parse_range(user_text, fallback):
     """
-    Parse a range entered as start,stop,step. Empty or invalid input uses fallback.
+    Read a range written as start,stop,step.
+
+    Empty or invalid input uses the suggested fallback range.
     """
     if not user_text.strip():
         return fallback
@@ -40,11 +42,21 @@ def parse_range(user_text, fallback):
 
 
 def prompt_range(label, fallback):
+    """
+    Ask the user to enter one manual E or S range.
+
+    Pressing Enter keeps the suggested range.
+    """
     raw = input(f"{label} range as start,stop,step [suggested {fallback}]: ")
     return parse_range(raw, fallback)
 
 
 def suggest_zoom_ranges(plot_result, fallback_e, fallback_s, padding=4):
+    """
+    Suggest smaller E and S ranges around the best point from a manual plot.
+
+    If no valid point is found, the fallback ranges are used.
+    """
     if not plot_result:
         return fallback_e, fallback_s
 
@@ -59,6 +71,12 @@ def suggest_zoom_ranges(plot_result, fallback_e, fallback_s, padding=4):
 
 # Main flow
 def main():
+    """
+    Run DSRA-PMLO using the selected mode in config.
+
+    Use automated mode for full automatic search. Use manual mode to choose E and S
+    ranges step by step.
+    """
     # --- AUTOMATED MODE ---
     if config["mode"] == "automated":
         model = DSRAAutomated(
@@ -120,7 +138,7 @@ def main():
 
         manual_bounds = [(step3_e[0], step3_e[1]), (step3_s[0], step3_s[1])]
         
-        print(f"Starting Dual Annealing Optimization with E/S bounds: {manual_bounds}")
+        print(f"Starting Dual Annealing Optimization with E and S bounds: {manual_bounds}")
         E_optimized, S_optimized, _, _, _ = model.optimize_and_reconstruct(manual_bounds)
 
         # Plot and evaluate test result

@@ -10,6 +10,11 @@ class DSRAAutomated(DSRABase):
         super().__init__(**kwargs)
         
     def prepare_train_data(self):
+        """
+        Split the loaded signal for automated mode.
+
+        The first 40% is kept for testing. The last 60% is used for training.
+        """
         total_len = len(self.sensor_data_total)
         
         # First 40% is reserved for testing; the remaining 60% is used for training.
@@ -21,14 +26,20 @@ class DSRAAutomated(DSRABase):
         
     # Load data automatically
     def load_data(self, target_size=None):
+        """
+        Load data for automated mode.
+
+        target_size can resize the signal before the train/test split.
+        """
         print("Automated loading...")
         return super().load_data(target_size=target_size)
     
     def find_optimal_params(self, range_e, range_s):
         """
-        Iterates through the grid and returns the configuration with the 
-        minimum number of measurements that still satisfies the similarity threshold.
-        Returns: [Min Measurements, Optimal E, Optimal S]
+        Find the best E and S pair inside one grid search.
+
+        The best pair uses the fewest samples while still meeting the error
+        threshold. Returns [number of samples, E, S].
         """
         # Request calculation results from the base class
         x, y, z = self.cal_dsra_grid(range_e, range_s)
@@ -57,8 +68,10 @@ class DSRAAutomated(DSRABase):
         max_iterations=10,
     ):
         """
-        Runs the automated notebook coarse-to-fine grid search and returns the final dual
-        annealing seed bounds: [measurements, E, S].
+        Run coarse-to-fine E and S grid search.
+
+        The search starts with broad ranges, then zooms in around the best pair.
+        Returns the search history and final seed values [samples, E, S].
         """
         range_e = self._validate_grid_range(range_e_init, "E")
         range_s = self._validate_grid_range(range_s_init, "S")
@@ -112,12 +125,15 @@ class DSRAAutomated(DSRABase):
     
     def optimize_and_reconstruct(self, seed_values=None, bounds=None):
         """
-        Optimize E and S using seed-centered bounds from the coarse-to-fine search.
+        Optimize E and S after the grid search.
+
+        If seed_values are provided, bounds are centered around the selected
+        E and S seed. If bounds are provided, those bounds are used directly.
         """
         if bounds is None:
             if seed_values is not None:
                 if not seed_values:
-                    raise ValueError("No seed values available. Run coarse-to-fine E/S search with a wider range or looser threshold.")
+                    raise ValueError("No seed values available. Run coarse-to-fine E and S search with a wider range or looser threshold.")
 
                 if len(seed_values) != 3:
                     raise ValueError("seed_values must be [measurements, E, S].")

@@ -21,6 +21,12 @@ class DSRABase:
         self.raw_data = None
 
     def load_data(self, target_size=None): 
+        """
+        Load the target column from a data file and prepare the training data.
+
+        target_size can resize the signal before splitting. The file must exist,
+        include the target column, and contain numeric finite values.
+        """
         self._validate_config()
         self._validate_target_size(target_size)
 
@@ -70,6 +76,11 @@ class DSRABase:
             raise ValueError(f"Target column '{self.target_col}' not found. Available columns: {available}")
 
     def prepare_train_data(self):
+        """
+        Split the loaded signal into testing and training parts.
+
+        The first 40% is kept for testing. The last 60% is used for training.
+        """
         # First 40% is reserved for testing; the remaining 60% is used for training.
         split_idx = round(len(self.sensor_data_total) * 0.4)
         
@@ -78,6 +89,11 @@ class DSRABase:
         print(f"Base Data Split: Train size = {len(self.train_data)} (Last 60%)")
         
     def get_data_summary(self):
+        """
+        Print basic data lengths and plot the full signal and training signal.
+
+        This is mainly for checking that the selected file and column look right.
+        """
         if self.sensor_data_total is not None:
             print(f"=== Data summary for {self.target_col} ===")
             print(f"Total length (training + testing): {len(self.sensor_data_total)}")
@@ -94,7 +110,12 @@ class DSRABase:
             plt.show()
             
     def interp_linear(self, x, y):
-        '''Linear interpolation'''
+        """
+        Rebuild a signal between selected samples using linear interpolation.
+
+        x contains sample indices and y contains sample values. Indices must be
+        in increasing order.
+        """
         if len(x) != len(y):
             raise ValueError("Interpolation x and y must have the same length.")
 
@@ -113,7 +134,12 @@ class DSRABase:
         return np.array(res)
     
     def interp_quadratic(self, x, y):
-        '''Quadratic interpolation'''
+        """
+        Rebuild a signal between selected samples using quadratic interpolation.
+
+        If only two samples are available, the method falls back to linear
+        interpolation.
+        """
         if len(x) != len(y):
             raise ValueError("Interpolation x and y must have the same length.")
 
@@ -142,7 +168,11 @@ class DSRABase:
         return np.array(res)
     
     def cor(self, f, g):
-        '''Return normalized dot-product similarity as a percentage.'''
+        """
+        Return correlation similarity between two signals as a percentage.
+
+        A higher value means the reconstructed signal is closer to the original.
+        """
         denom = math.sqrt(np.dot(f, f)) * math.sqrt(np.dot(g, g))
         if denom == 0:
             raise ValueError("Correlation is undefined for all-zero signals.")
@@ -150,11 +180,21 @@ class DSRABase:
         return 100 * np.dot(f, g) / denom
     
     def MAAPE(self, f,g):
+        """
+        Return the MAAPE error between two signals as a percentage.
+
+        A lower value means the reconstructed signal is closer to the original.
+        """
         EPSILON = 1e-10
         return np.mean(np.arctan(np.abs((f - g) / (f + EPSILON)))) * 100
 
     def measure(self, params, *other):                                                        
-        '''Returns the number of measurements for certain E and S.'''
+        """
+        Return the number of samples used by one E and S pair.
+
+        If the reconstructed signal does not meet the threshold, this returns
+        the full data length so the optimizer will avoid that E and S pair.
+        """
         data, interpolation, error, min_sim = other
         data = self._validate_data_ready(data)
         E, S = params
@@ -194,8 +234,10 @@ class DSRABase:
 
     def cal_dsra_grid(self, range_e, range_s):
         """
-        Core computation engine: Runs the DSRA logic across a grid of E and S.
-        Returns three lists: x (E values), y (S values), and z (Number of measurements).
+        Test many E and S pairs and keep the pairs that meet the threshold.
+
+        Returns E values, S values, and the number of selected samples for each
+        valid pair.
         """
         z_vals, x_vals, y_vals = [], [], []
         data = self._validate_data_ready(self.train_data, "Training data")
@@ -218,8 +260,15 @@ class DSRABase:
 
     def reconstruct_signal(self, E, S, data=None):
         """
-        Internal engine to perform DSRA sampling and signal reconstruction.
-        Returns: similarity, reconstructed_signal, measurement_values, measurement_indices, reduction_rate
+        Sample and reconstruct a signal using DSRA.
+
+        E is the base sampling interval. S controls how much the local slope
+        changes the next interval. If data is not provided, training data is
+        used.
+
+        Returns the error/similarity value, reconstructed signal, selected
+        sample values, selected sample indices, sampling reduction percentage,
+        and number of selected samples.
         """
         if data is None:
             data = self.train_data
@@ -273,7 +322,13 @@ class DSRABase:
         return similarity, reconstructed, measurements, indices, reduction, num_samples
     
     def plot_reconstruction(self, E, S, data=None, title_prefix="Final Evaluation"):
-        # If pass in test data use it，else use training data
+        """
+        Plot the original signal, reconstructed signal, and selected samples.
+
+        If data is not provided, training data is used. Test data should be
+        passed in when plotting the final test evaluation.
+        """
+        # If test data is passed in, use it; otherwise use training data.
 
         if data is None:
             print("Plotting training data because no data was provided.")
@@ -318,7 +373,10 @@ class DSRABase:
         
     def evaluate_test_set(self, E, S, split_ratio=0.4, new_filepath=None):
         """
-        Use optimized E and S for testing data evaluation.
+        Evaluate optimized E and S on the held-out test data.
+
+        By default, the first 40% of the loaded signal is used as testing data.
+        The result is printed and plotted.
         """
         # Handle newly passed in file
         if new_filepath:
