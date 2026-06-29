@@ -78,12 +78,10 @@ Do not run `automated.py`, `manual.py`, or `base.py` directly. They are package 
 
 ### Option 1: Local Setup
 
-From the project root:
+First, clone the repository and install the package:
 
 ```bash
-First, clone the repository and install the package.
 git clone https://github.com/Hatemgab/DSRA-PMLO-Adaptive-Sampling.git
-
 cd DSRA-PMLO-Adaptive-Sampling
 
 python3 -m venv .venv  # windows: py -m venv .venv
