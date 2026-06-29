@@ -81,7 +81,7 @@ Do not run `automated.py`, `manual.py`, or `base.py` directly. They are package 
 From the project root:
 
 ```bash
-cd /path/to/DSRA-PMLO
+cd /path/to/DSRA-PMLO-Adaptive-Sampling
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
@@ -105,7 +105,7 @@ dsra-use-case
 In Colab, install the project as a Python package before importing it.
 
 ```python
-git clone https://github.com/Hatemgab/DSRA-PMLO-Adaptive-Sampling.git
+!git clone https://github.com/Hatemgab/DSRA-PMLO-Adaptive-Sampling.git
 cd DSRA-PMLO-Adaptive-Sampling
 python -m pip install -e .
 %cd src
