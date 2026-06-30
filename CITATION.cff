@@ -2,17 +2,24 @@ cff-version: 1.2.0
 message: "If you use this software, please cite the software and the associated research publications."
 type: software
 title: "DSRA-PMLO: Parametric Adaptive Sampling for Efficient IoT Data Collection"
-abstract: "A parametric adaptive sampling algorithm that reduces IoT sensor-data transmission while keeping reconstructed signals within a user-defined error threshold."
+
+abstract: >
+  A parametric adaptive sampling algorithm that reduces IoT sensor-data
+  transmission while keeping reconstructed signals within a user-defined
+  error threshold.
+
 authors:
   - family-names: "Algabroun"
     given-names: "Hatem"
     orcid: "https://orcid.org/0000-0001-5320-1154"
   - family-names: "Wu"
     given-names: "Sisi"
+
 version: "1.0.0"
 repository-code: "https://github.com/Hatemgab/DSRA-PMLO-Adaptive-Sampling"
 url: "https://github.com/Hatemgab/DSRA-PMLO-Adaptive-Sampling"
 license: MIT
+
 keywords:
   - adaptive sampling
   - Internet of Things
@@ -21,6 +28,7 @@ keywords:
   - sensor data
   - energy efficiency
   - edge computing
+
 preferred-citation:
   type: article
   title: "Parametric Machine Learning-Based Adaptive Sampling Algorithm for Efficient IoT Data Collection in Environmental Monitoring"
@@ -35,6 +43,7 @@ preferred-citation:
   volume: 33
   issue: 1
   doi: "10.1007/s10922-024-09881-1"
+
 references:
   - type: article
     title: "Dynamic sampling rate algorithm (DSRA) implemented in self-adaptive software architecture: a way to reduce the energy consumption of wireless sensors through event-based sampling"
