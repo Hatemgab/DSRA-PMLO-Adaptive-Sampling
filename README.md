@@ -98,56 +98,18 @@ Run the project:
 python -m dsra_pmlo.use_case
 ```
 
-You can also use the installed command:
+### Option 2: Google Colab
 
-```bash
-dsra-use-case
-```
+For an interactive demonstration with inline figures, open the Google Colab notebook below.
 
-### Option 2: Google Colab Setup
+The notebook demonstrates:
 
-In Colab, install the project as a Python package before importing it.
+- Automated Mode
+- Manual Mode
+- Parameter optimization
+- Signal reconstruction and visualization
 
-```python
-!git clone https://github.com/Hatemgab/DSRA-PMLO-Adaptive-Sampling.git
-cd DSRA-PMLO-Adaptive-Sampling
-python -m pip install -e .
-%cd src
-```
-
-Then import the package:
-
-```python
-from dsra_pmlo.manual import DSRAManual
-from dsra_pmlo.automated import DSRAAutomated
-```
-
-Or run the configured use case:
-
-```python
-!python -m dsra_pmlo.use_case
-```
-
-The output text and final chart appear directly below the Colab cell that runs
-the use case. The chart is not saved to a file unless you add save code yourself.
-
-In Google Colab, use a full data path in `use_case.py` to avoid file path errors:
-
-```python
-config["file"] = "/content/DSRA-PMLO/src/dsra_pmlo/data/synthetic_data.txt"
-```
-
-If you upload the project folder manually to Colab instead of cloning from GitHub, make sure the current working directory is the repository root, the folder that contains `pyproject.toml`, before running:
-
-```python
-!python -m pip install -e .
-```
-
-After installation, move into `src` before running the use case:
-
-```python
-%cd src
-```
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1c2oSEfkln90XC6kJBJe8xVhPjo1kopzJ?usp=sharing)
 
 ## Data Setup
 
