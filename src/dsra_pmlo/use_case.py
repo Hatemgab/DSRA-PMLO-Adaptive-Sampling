@@ -26,18 +26,22 @@ def parse_range(user_text, fallback):
     """
     Read a range written as start,stop,step.
 
-    Empty or invalid input uses the suggested fallback range.
+    Empty or invalid input uses the suggested fallback range. Parentheses,
+    brackets, commas, and spaces are accepted.
     """
-    if not user_text.strip():
+    clean_text = user_text.strip()
+    if not clean_text:
         return fallback
 
     try:
-        start, stop, step = [int(value.strip()) for value in user_text.split(",")]
+        clean_text = clean_text.strip("()[]")
+        clean_text = clean_text.replace(",", " ")
+        start, stop, step = [int(value) for value in clean_text.split()]
         if step <= 0 or stop <= start:
             raise ValueError
         return (start, stop, step)
     except ValueError:
-        print(f"Invalid range. Using suggested range: {fallback}")
+        print(f"Invalid range. Use start,stop,step. Using suggested range: {fallback}")
         return fallback
 
 

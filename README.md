@@ -44,6 +44,7 @@ The algorithm reconstructs the original signal from selected sampling points and
 DSRA-PMLO/
 ├── pyproject.toml
 ├── README.md
+├── LICENSE.txt
 ├── src/
 │   └── dsra_pmlo/
 │       ├── __init__.py
@@ -70,7 +71,7 @@ Do not run `automated.py`, `manual.py`, or `base.py` directly. They are package 
 
 ## Video Demonstration
 
-[![Video Demo](https://img.shields.io/badge/Video-Demo-red)](video_address)
+[![Video Demo](https://img.shields.io/badge/Video-Demo-red)](https://youtu.be/q6RAmPTH7zw?si=GKjFMcR7Is5H-a_S)
 
 > *Click the badge above to watch a short video on how to use the Manual and Automated modes.*
 
