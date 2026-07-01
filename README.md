@@ -6,7 +6,7 @@ DSRA-PMLO helps reduce sensor data transmission by selecting fewer sampling poin
 The goal is to use recorded data for adaptive sampling without violating the
 predefined approximation constraint.
 
-![DSRA-PMLO workflow](./docs/assets/dsra_pmlo_workflow_v2.png)
+![DSRA-PMLO workflow](./docs/assets/dsra_pmlo_workflow_v3.png)
 
 DSRA-PMLO Software package input/output: The main input is the selected data file and target column. The main outputs are the optimized E and S values, the test-set error, the sampling reduction, and the reconstruction plot.
 
