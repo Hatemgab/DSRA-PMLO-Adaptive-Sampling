@@ -371,4 +371,4 @@ The repository root is the folder containing `pyproject.toml`.
 
 ## Questions & Feedback
 
-Please open a GitHub Issue so questions, fixes, and examples stay visible for future users. Or feel free to contact owner [Hatem Algabroun]: Hatem.algabroun@lnu.se, contributor [Sisi Wu]: cathywu544@gmail.com
+Please open a GitHub Issue so questions, fixes, and examples stay visible for future users. Or feel free to contact owner [Hatem Algabroun]: hatem.algabroun@lnu.se, contributor [Sisi Wu]: cathywu544@gmail.com
