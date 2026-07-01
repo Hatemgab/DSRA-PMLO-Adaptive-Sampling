@@ -108,9 +108,19 @@ Do not run `automated.py`, `manual.py`, or `base.py` directly. They are package 
 
 ## Video Demonstration
 
-[![Video Demo](https://img.shields.io/badge/Video-Demo-red)](https://youtu.be/q6RAmPTH7zw?si=GKjFMcR7Is5H-a_S)
+<p align="center">
+  <a href="https://youtu.be/q6RAmPTH7zw">
+    <img
+      src="https://img.youtube.com/vi/q6RAmPTH7zw/hqdefault.jpg"
+      alt="DSRA-PMLO video demonstration"
+      width="700"
+    >
+  </a>
+</p>
 
- **Click the badge above to watch a short video on how to use the Manual and Automated modes.**
+<p align="center">
+  <strong>Click the video preview to watch how to use the Manual and Automated modes.</strong>
+</p>
 
 ## Environment Setup
 
