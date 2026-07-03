@@ -60,7 +60,7 @@ Software repository:
 }
 ```
 
-## Result Demonstration
+## Demonstration
 
 https://github.com/user-attachments/assets/a74d40a2-fe6e-4e91-8129-8563600149d8
 
