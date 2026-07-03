@@ -60,7 +60,7 @@ Software repository:
 }
 ```
 
-## Demonstration
+## Video Demonstration - how it works
 
 https://github.com/user-attachments/assets/a74d40a2-fe6e-4e91-8129-8563600149d8
 
@@ -106,7 +106,7 @@ src/dsra_pmlo/use_case.py
 
 Do not run `automated.py`, `manual.py`, or `base.py` directly. They are package modules.
 
-## Video Demonstration
+## Video Demonstration - user guide 
 
 [![DSRA-PMLO video demonstration](https://img.youtube.com/vi/q6RAmPTH7zw/hqdefault.jpg)](https://youtu.be/q6RAmPTH7zw)
 
