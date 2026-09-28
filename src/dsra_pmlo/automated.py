@@ -123,7 +123,7 @@ class DSRAAutomated(DSRABase):
         print("Starting final optimization around the selected E and S seed...")
         return search_history, seeds
     
-    def optimize_and_reconstruct(self, seed_values=None, bounds=None):
+    def optimize_and_reconstruct(self, seed_values=None, bounds=None, random_seed=1):
         """
         Optimize E and S after the grid search.
 
@@ -155,6 +155,7 @@ class DSRAAutomated(DSRABase):
             bounds,
             args=arg_package,
             maxiter=10000,
+            seed=random_seed,
         )
         E_opt, S_opt = resdual.x
 
