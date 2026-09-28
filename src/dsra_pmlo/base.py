@@ -321,7 +321,16 @@ class DSRABase:
         
         return similarity, reconstructed, measurements, indices, reduction, num_samples
     
-    def plot_reconstruction(self, E, S, data=None, title_prefix="Final Evaluation"):
+    def plot_reconstruction(
+        self,
+        E,
+        S,
+        data=None,
+        title_prefix="Final Evaluation",
+        time_data=None,
+        plot_path=None,
+        time_limit=None,
+    ):
         """
         Plot the original signal, reconstructed signal, and selected samples.
 
@@ -335,43 +344,76 @@ class DSRABase:
             target_data = self.train_data
         else:
             target_data = data
+
+        if time_data is None:
+            time_data = np.arange(len(target_data))
+        else:
+            time_data = np.asarray(time_data, dtype=float)
+            if len(time_data) != len(target_data):
+                raise ValueError("time_data must have the same length as the plotted data.")
         
         # Get result
         sim, recon, meas, idx, red, num_samples = self.reconstruct_signal(E, S, data=target_data)
         
         plt.figure(figsize=(12, 5))
-        plt.plot(target_data, color='orange', label='Original Signal', alpha=0.8)
+        plt.plot(time_data, target_data, color='orange', label='Original Signal', alpha=0.8)
         plt.plot(
+            time_data,
             recon,
             linestyle=(0, (7, 7)),
             color='blue',
             label=f'DSRA Reconstruction (E={E:.4f}, S={S:.4f})',
+            zorder=5,
         )
 
-        signal_range = np.max(target_data) - np.min(target_data)
-        baseline = np.min(target_data) - 0.1 * signal_range
         plt.scatter(
-            idx,
-            np.full(len(idx), baseline),
+            time_data[idx],
+            target_data[idx],
+            color='limegreen',
             edgecolors='black',
-            facecolors='tab:blue',
-            s=35,
+            marker='o',
+            s=12,
+            alpha=0.85,
+            linewidths=0.3,
             label='Sampling Points',
-            zorder=3,
+            zorder=4,
         )
-        plt.axhline(y=baseline, color='gray', linestyle='--', alpha=0.5)
         
         # Show how many samples are used 
-        plt.title(f"Number of samples = {num_samples}, error = {sim} %, sampling reduced by = {red}%")
-        plt.xlabel("Time(S)")
+        plt.title(
+            f"Number of samples = {num_samples}, error = {sim}%, "
+            f"sampling reduced by = {red:.1f}%"
+        )
+        plt.xlabel("Time (s)")
+        if time_limit is not None:
+            plt.xlim(0, time_limit)
+            plt.xticks(np.linspace(0, time_limit, 9))
+        elif time_data is not None and len(time_data) and time_data[0] == 0:
+            if np.isclose(time_data[-1], 0.4, atol=1e-4):
+                plt.xlim(0, 0.4)
+                plt.xticks(np.linspace(0, 0.4, 9))
+            else:
+                plt.xlim(0, time_data[-1])
         plt.ylabel("Data value")
         plt.legend(loc='upper right')
         plt.grid(ls='--')
-        plt.show()
+        if plot_path is not None:
+            plt.savefig(plot_path, dpi=200, bbox_inches="tight")
+            plt.close()
+        else:
+            plt.show()
         
         print(f"Testing Results -> Samples: {num_samples}, Reduction: {red:.2f}%, Error: {sim:.4f}%")
         
-    def evaluate_test_set(self, E, S, split_ratio=0.4, new_filepath=None):
+    def evaluate_test_set(
+        self,
+        E,
+        S,
+        split_ratio=0.4,
+        new_filepath=None,
+        plot_path=None,
+        time_duration=None,
+    ):
         """
         Evaluate optimized E and S on the held-out test data.
 
@@ -387,6 +429,17 @@ class DSRABase:
         split_idx = round(len(self.sensor_data_total) * split_ratio)
         test_data = self.sensor_data_total[:split_idx]
         test_data = self._validate_data_ready(test_data, "Test data")
+        if "Time" in self.raw_data.columns and len(self.raw_data) == len(self.sensor_data_total):
+            test_time = pd.to_numeric(self.raw_data["Time"], errors="raise").to_numpy(dtype=float)[:split_idx]
+            plot_time_limit = None
+        elif time_duration is not None:
+            if not np.isfinite(time_duration) or time_duration <= 0:
+                raise ValueError("time_duration must be a positive finite number of seconds.")
+            test_time = np.arange(split_idx, dtype=float) * (time_duration / split_idx)
+            plot_time_limit = time_duration
+        else:
+            test_time = np.arange(split_idx, dtype=float)
+            plot_time_limit = None
 
         print(f"\n--- TEST SET EVALUATION (First {int(split_ratio*100)}%) ---")
         print(f"Testing data length: {len(test_data)}")
@@ -401,7 +454,15 @@ class DSRABase:
         print(f"MAAPE error in Test Set: {sim:.4f}%")
 
         # Visulaize 
-        self.plot_reconstruction(E, S, data=test_data, title_prefix="Test Evaluation")
+        self.plot_reconstruction(
+            E,
+            S,
+            data=test_data,
+            time_data=test_time,
+            title_prefix="Test Evaluation",
+            plot_path=plot_path,
+            time_limit=plot_time_limit,
+        )
     
         return sim, red, num_samples
     
