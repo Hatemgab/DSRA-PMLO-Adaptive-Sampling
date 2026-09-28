@@ -66,7 +66,7 @@ class DSRAManual(DSRABase):
 
         return [z, x, y]
 
-    def optimize_and_reconstruct(self, bounds):
+    def optimize_and_reconstruct(self, bounds, random_seed=1):
         """
         Optimize E and S inside manually selected bounds.
 
@@ -87,6 +87,7 @@ class DSRAManual(DSRABase):
             bounds,
             args=arg_package,
             maxiter=10000,
+            seed=random_seed,
         )
         E_opt, S_opt = resdual.x
 
