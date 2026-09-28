@@ -204,6 +204,28 @@ config = {
 | Visualization | Three zoom-in grid search plots | Final reconstruction/evaluation plot |
 | Best for | Inspection and controlled tuning | Set and run optimization |
 
+## Choosing the settings
+
+### Training and test split
+
+The standard `use_case.py` workflow uses a fixed 60/40 split: the first 40% of
+the loaded signal is reserved for testing, and the remaining 60% is used to
+fit the sampling parameters. This split is set in the code and is not a
+setting in `use_case.py`. Keeping 60% for training gives the optimizer enough
+data to fit both parameters, while the held-out test segment remains long
+enough to evaluate reconstruction over multiple signal cycles. For the
+revised synthetic setup, the 0.4 s test segment contains four cycles of the
+10 Hz lowest-frequency component.
+
+### Dual annealing
+
+The standard workflow fixes the dual-annealing random seed at **1** in the
+code, so the stochastic optimization can be reproduced without adding a seed
+setting to the user configuration. When calling the optimization methods
+directly, `random_seed` can be supplied for explicit multi-seed experiments.
+Other dual-annealing options are documented in the
+[SciPy `dual_annealing` reference](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.dual_annealing.html).
+
 ## Automated Mode
 
 Use automated mode when you want the program to find E and S with minimal user input.
@@ -279,8 +301,8 @@ The final graph shows:
 
 - **Original Signal** in orange.
 - **DSRA Reconstruction** in blue dashed lines.
-- **Sampling Points** along the bottom baseline.
-- x-axis: `Time(S)`
+- **Sampling Points** at the selected signal locations.
+- x-axis: `Time (s)`
 - y-axis: `Data value`
 
 
