@@ -11,11 +11,11 @@ from dsra_pmlo.automated import DSRAAutomated
 
 # Only change paramaters from config
 config = {
-    "file": "src/dsra_pmlo/data/synthetic_data.txt",
+    "file": "src/dsra_pmlo/data/downsampled_data_20000.txt",
     "mode": "automated", # change 'automated' to 'manual' for setting search ranges manually
     "target_col": "Amplitude",
-    "target_size": 400,
-    "threshold": 2,
+    "target_size": 20000,
+    "threshold": 3,
     # Manual mode Step 1 ranges. Edit these for the first broad search.
     "manual_step1_e": (0, 30, 2),
     "manual_step1_s": (-20, 450, 5),
@@ -92,7 +92,12 @@ def main():
         
         # Execute coarse-to-fine grid search, then optimize around the selected seed.
         _, seeds = model.run_iterative_grid_search()
-        E_opt, S_opt, _, _, _ = model.optimize_and_reconstruct(seeds)
+        E_opt, S_opt, train_reduction, train_error, _ = model.optimize_and_reconstruct(seeds)
+        print(
+            f"Training Results -> Error: {train_error:.4f}%, "
+            f"Threshold: {config['threshold']:.4f}%, "
+            f"Reduction: {train_reduction:.2f}%"
+        )
         
         # Evaluate test result
         model.evaluate_test_set(E=E_opt, S=S_opt)
@@ -143,7 +148,14 @@ def main():
         manual_bounds = [(step3_e[0], step3_e[1]), (step3_s[0], step3_s[1])]
         
         print(f"Starting Dual Annealing Optimization with E and S bounds: {manual_bounds}")
-        E_optimized, S_optimized, _, _, _ = model.optimize_and_reconstruct(manual_bounds)
+        E_optimized, S_optimized, train_reduction, train_error, _ = model.optimize_and_reconstruct(
+            manual_bounds
+        )
+        print(
+            f"Training Results -> Error: {train_error:.4f}%, "
+            f"Threshold: {config['threshold']:.4f}%, "
+            f"Reduction: {train_reduction:.2f}%"
+        )
 
         # Plot and evaluate test result
         model.evaluate_test_set(E=E_optimized, S=S_optimized)
