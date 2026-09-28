@@ -93,6 +93,7 @@ DSRA-PMLO/
 │           ├── motor_light_load.txt
 │           ├── motor_no_load_brb.txt
 │           ├── motor_no_load.txt
+│           ├── downsampled_data_20000.txt
 │           └── synthetic_data.txt
 └── tests/
     └── test.py
@@ -171,18 +172,25 @@ The first row must contain column names. Example:
 ```text
 Time    Amplitude
 0.0     -0.0200
-0.1      2.3366
+0.00005  6.7498
 ```
+
+The current synthetic evaluation uses
+`src/dsra_pmlo/data/downsampled_data_20000.txt`, a 20,000-sample downsample of
+the 60,000-sample synthetic record. It has `Time` values in seconds and an
+`Amplitude` column. The timestamps span approximately 1 s at a nominal
+sampling rate of 20 kHz. Keep the `Time` column when preparing or replacing
+this file so the reconstruction plot uses seconds on its horizontal axis.
 
 In `src/dsra_pmlo/use_case.py`, update:
 
 ```python
 config = {
-    "file": "src/dsra_pmlo/data/synthetic_data.txt",
+    "file": "src/dsra_pmlo/data/downsampled_data_20000.txt",
     "mode": "automated",
     "target_col": "Amplitude",
-    "target_size": 400,
-    "threshold": 2,
+    "target_size": 20000,
+    "threshold": 3,
     "manual_step1_e": (0, 30, 2),
     "manual_step1_s": (-20, 450, 5),
 }
@@ -191,7 +199,7 @@ config = {
 - `file`: path to your dataset.
 - `mode`: choose `"automated"` or `"manual"`.
 - `target_col`: the column to reconstruct.
-- `target_size`: resize the dataset for testing; set to `None` to use the full file.
+- `target_size`: number of data values to load. This file already has 20,000 rows, so `20000` leaves it unchanged; `None` also loads all rows.
 - `threshold`: maximum accepted MAAPE error percentage.
 - `manual_step1_e`: the first broad E range used in manual mode.
 - `manual_step1_s`: the first broad S range used in manual mode.
@@ -214,8 +222,9 @@ fit the sampling parameters. This split is set in the code and is not a
 setting in `use_case.py`. Keeping 60% for training gives the optimizer enough
 data to fit both parameters, while the held-out test segment remains long
 enough to evaluate reconstruction over multiple signal cycles. For the
-revised synthetic setup, the 0.4 s test segment contains four cycles of the
-10 Hz lowest-frequency component.
+20,000-sample synthetic record, this gives 12,000 training samples (0.6 s)
+and 8,000 test samples (0.4 s). The test segment contains four cycles of the
+10 Hz lowest-frequency component and ten samples per cycle at 2,000 Hz.
 
 ### Dual annealing
 
@@ -321,12 +330,12 @@ The final graph shows:
 from dsra_pmlo.automated import DSRAAutomated
 
 model = DSRAAutomated(
-    filepath="src/dsra_pmlo/data/synthetic_data.txt",
+    filepath="src/dsra_pmlo/data/downsampled_data_20000.txt",
     target_col="Amplitude",
-    similarity_threshold=2,
+    similarity_threshold=3,
 )
 
-model.load_data(target_size=400)
+model.load_data(target_size=20000)
 _, seeds = model.run_iterative_grid_search()
 E, S, reduction, error, reconstructed = model.optimize_and_reconstruct(seeds)
 model.evaluate_test_set(E=E, S=S)
@@ -338,12 +347,12 @@ Manual mode:
 from dsra_pmlo.manual import DSRAManual
 
 model = DSRAManual(
-    filepath="src/dsra_pmlo/data/synthetic_data.txt",
+    filepath="src/dsra_pmlo/data/downsampled_data_20000.txt",
     target_col="Amplitude",
-    similarity_threshold=2,
+    similarity_threshold=3,
 )
 
-model.load_data(target_size=400)
+model.load_data(target_size=20000)
 model.plot2d(range(0, 30, 2), range(-20, 450, 5))
 ```
 
