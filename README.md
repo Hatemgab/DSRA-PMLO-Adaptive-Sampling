@@ -17,7 +17,7 @@ or derived software, please cite both of the following:
 ### 1. Software repository
 
 Algabroun, H., & Wu, S. (2026). *DSRA-PMLO-Adaptive-Sampling*
-(Version 1.0.0) [Computer software]. GitHub.
+(Version 1.0.1) [Computer software]. GitHub.
 https://github.com/Hatemgab/DSRA-PMLO-Adaptive-Sampling
 
 ### 2. Theoretical background
