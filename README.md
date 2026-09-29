@@ -41,7 +41,7 @@ Software repository:
 @software{algabroun_wu_dsra_pmlo_2026,
   author    = {Algabroun, Hatem and Wu, Sisi},
   title     = {{DSRA-PMLO-Adaptive-Sampling}},
-  version   = {1.0.0},
+  version   = {1.0.1},
   year      = {2026},
   publisher = {GitHub},
   url       = {https://github.com/Hatemgab/DSRA-PMLO-Adaptive-Sampling}
