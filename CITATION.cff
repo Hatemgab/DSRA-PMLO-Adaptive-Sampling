@@ -14,7 +14,7 @@ authors:
   - family-names: "Wu"
     given-names: "Sisi"
 
-version: "1.0.0"
+version: "1.0.1"
 
 repository-code: "https://github.com/Hatemgab/DSRA-PMLO-Adaptive-Sampling"
 
