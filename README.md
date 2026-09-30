@@ -90,7 +90,7 @@ DSRA-PMLO/
 │       ├── automated.py
 │       ├── use_case.py
 │       └── data/
-│           ├── motor_light_load.txt
+│           ├── motor_light_load_brb.txt
 │           ├── motor_no_load_brb.txt
 │           ├── motor_no_load.txt
 │           ├── downsampled_data_20000.txt
